@@ -3,18 +3,17 @@ local M = {}
 --- @type NtseOptions
 M.values = {
     auto_install = false,
-    ensure_installed = {}, --
-    ignore_install = {}, --
-    sync_install = false, --
+    ensure_installed = {},
+    ignore_install = {},
+    sync_install = false,
 
     highlight = {
-        enable = true, --
-        additional_vim_regex_highlighting = {}, -- OPTIONAL
+        enable = true,
         disable = {},
-        use_languagetree = true,
     },
 
-    indent = true, --
+    indent = false, -- experimental
+    fold = false,
 }
 
 function M.apply(opts)
