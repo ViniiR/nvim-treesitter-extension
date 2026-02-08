@@ -65,7 +65,6 @@ if config.auto_install then
     autocmd("FileType", {
         callback = function(args)
             -- do not install these parsers
-            -- it also ends up never highlighting them, so it sort of overrides highlight.disable for the same functionality
             if #config.ignore_install > 0 and vim.tbl_contains(config.ignore_install, args.match) then
                 return
             end
