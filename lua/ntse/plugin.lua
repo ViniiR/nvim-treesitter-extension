@@ -109,3 +109,73 @@ if config.highlight.enable then
         end,
     })
 end
+
+local function parse_version(value)
+    if type(value) == "string" then
+        local version = {}
+        local val = value:gsub("tree.sitter ", "")
+        for str in val:gmatch("([^\\.]+)") do
+            if tonumber(str) ~= nil then
+                table.insert(version, tonumber(str))
+            end
+        end
+        return version
+    end
+
+    local version = {}
+    for _, val in ipairs(value) do
+        if val:find("TREE_SITTER_MIN_VER") then
+            -- local parsed = val:gsub("local TREE_SITTER_MIN_VER =", "")
+            for str in val:gmatch("([^%s]+)") do
+                str = str:gsub(",", "")
+                if tonumber(str) ~= nil then
+                    table.insert(version, tonumber(str))
+                end
+            end
+        end
+    end
+    return version
+end
+
+local function make_version(str)
+    return string.format("%s.%s.%s", str[1], str[2], str[3])
+end
+
+if config.warn_cli_version then
+    local res = vim.system({
+        "tree-sitter",
+        "--version",
+    }):wait()
+    if res.code ~= 0 then
+        vim.notify("Treesitter cli was not found", vim.log.levels.ERROR)
+        return
+    end
+
+    -- NOTE: i'm aware this is a hacky way to get the version but it is what is is.
+    local health_file =
+        vim.fn.readfile(vim.api.nvim_get_runtime_file("lua/nvim-treesitter/health.lua", false)[1], nil, 30)
+
+    local min_version = parse_version(health_file)
+    local version = parse_version(res.stdout)
+
+    local message =
+        string.format("Expected version '%s', got version '%s'", make_version(min_version), make_version(version))
+
+    -- Major
+    if version[1] > min_version[1] then
+        return
+    end
+
+    -- Patch
+    if version[1] == min_version[1] and version[2] == min_version[2] and version[3] < min_version[3] then
+        vim.notify(message, vim.log.levels.ERROR)
+        return
+    end
+
+    -- Minor
+    if version[1] == min_version[1] and version[2] >= min_version[2] then
+        return
+    end
+
+    vim.notify(message, vim.log.levels.ERROR)
+end
