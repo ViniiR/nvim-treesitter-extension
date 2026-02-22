@@ -20,6 +20,8 @@
 --- NOTE: you must set foldmethod externally
 ---@field fold boolean?
 ---@field highlight NtseHlOpt?
+--- Check if tree-sitter cli version matches
+---@field warn_cli_version boolean?
 
 ---@alias NtseOpts NtseOptions
 

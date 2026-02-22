@@ -14,6 +14,8 @@ M.values = {
 
     indent = false, -- experimental
     fold = false,
+
+    warn_cli_version = true,
 }
 
 function M.apply(opts)
